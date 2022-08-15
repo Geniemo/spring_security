@@ -14,7 +14,7 @@ spring:
     username: root
     password: root
 
-# mustache ? ??? ??? ?? ??? ??? ?? ??
+# mustache 설정했으므로 생략 가능
 #  mvc:
 #    view:
 #      prefix: /templates/
@@ -26,3 +26,14 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 163398175228-f2bl7k4qusebmdjf804ql2b6t1rrch6t.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile

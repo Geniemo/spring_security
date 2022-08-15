@@ -2,6 +2,7 @@ package com.cos.security1.auth;
 
 import com.cos.security1.model.User;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,6 +18,7 @@ import java.util.Collection;
 // Security Session 에 정보를 저장하는데 여기에 들어갈 수 있는 객체가 Authentication 이고,
 // Authentication 에 유저 정보 저장할 때 UserDetails 로 저장한다.
 @AllArgsConstructor
+@Getter
 public class PrincipalDetails implements UserDetails {
 
     private User user;
