@@ -17,6 +17,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     // 여기서 return 하는 게 Authentication 내부에 들어가고 이게 시큐리티 세션에 들어간다.
+    // 메서드 종료 시 @AuthenticationPrincipal 어노테이션 생성
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);

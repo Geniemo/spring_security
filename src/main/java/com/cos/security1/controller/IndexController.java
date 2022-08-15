@@ -24,6 +24,9 @@ public class IndexController {
     private final BCryptPasswordEncoder passwordEncoder;
     
     // @AuthenticationPrincipal 를 통해서 세션 정보에 접근 가능
+    // 일반 로그인을 하면 시큐리티 세션에 들어가는 Authentication 에 UserDetails 가 들어가고 소셜 로그인을 하면 OAuth2User 가 들어간다.
+    // 그러면 일반 로그인을 할 때랑 소셜 로그인을 할 때랑 따로따로 만들어줘야 하는가? 이에 대한 해결책이 있다.
+    // UserDetails 를 구현하고 있는 PrincipalDetails 가 OAuth2User 도 구현하게 하면 된다.
     @GetMapping("/test/login")
     public @ResponseBody String testLogin(Authentication authentication, @AuthenticationPrincipal PrincipalDetails userDetails) {
         System.out.println("IndexController.testLogin");
@@ -54,7 +57,8 @@ public class IndexController {
     }
 
     @GetMapping("/user")
-    public @ResponseBody String user() {
+    public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        System.out.println("principalDetails.getUser() = " + principalDetails.getUser());
         return "user";
     }
 

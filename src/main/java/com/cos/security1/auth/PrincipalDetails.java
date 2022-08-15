@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 // 시큐리티가 /login 을 낚아채서 로그인을 진행시킨다.
 // 로그인을 완료하면 시큐리티 session 을 만들어준다. (Security ContextHolder 라는 키 값에다가 세션 정보를 저장한다.)
@@ -17,12 +19,23 @@ import java.util.Collection;
 
 // Security Session 에 정보를 저장하는데 여기에 들어갈 수 있는 객체가 Authentication 이고,
 // Authentication 에 유저 정보 저장할 때 UserDetails 로 저장한다.
-@AllArgsConstructor
 @Getter
-public class PrincipalDetails implements UserDetails {
+public class PrincipalDetails implements UserDetails, OAuth2User {
 
     private User user;
+    private Map<String, Object> attributes;
     
+    // 일반 로그인 사용
+    public PrincipalDetails(User user) {
+        this.user = user;
+    }
+    
+    // OAuth 로그인 시 사용
+    public PrincipalDetails(User user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
+    }
+
     // 해당 유저의 권한을 리턴하는 곳
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -69,5 +82,21 @@ public class PrincipalDetails implements UserDetails {
     public boolean isEnabled() {
         // 예를 들어 유저에 마지막 로그인 시간이 있다면 현재 시간 - 로그인 시간 해서 1년 지났다면 false 반환하는 식으로 구현
         return true;
+    }
+
+    @Override
+    public <A> A getAttribute(String name) {
+        return OAuth2User.super.getAttribute(name);
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+//        return (String) attributes.get("sub");
+        return null; // 중요하지 않고 안쓰므로 그냥 null
     }
 }

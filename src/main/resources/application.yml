@@ -10,9 +10,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/security?serverTimezone=Asia/Seoul
-    username: root
-    password: root
+    url: jdbc:mysql://park.desktop.kro.kr:3306/security?serverTimezone=Asia/Seoul
+    username: kor98won
+    password: p98j08w08#!@
 
 # mustache 설정했으므로 생략 가능
 #  mvc:
