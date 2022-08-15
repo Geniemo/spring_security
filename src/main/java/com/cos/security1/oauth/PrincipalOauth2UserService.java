@@ -2,6 +2,9 @@ package com.cos.security1.oauth;
 
 import com.cos.security1.auth.PrincipalDetails;
 import com.cos.security1.model.User;
+import com.cos.security1.oauth.provider.FacebookUserInfo;
+import com.cos.security1.oauth.provider.GoogleUserInfo;
+import com.cos.security1.oauth.provider.OAuth2UserInfo;
 import com.cos.security1.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -49,10 +52,21 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         providerId = "{sub}"
          */
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        String provider = userRequest.getClientRegistration().getRegistrationId(); // google
-        String providerId = oAuth2User.getAttribute("sub");
-        String username = provider + providerId;
-        String email = oAuth2User.getAttribute("email");
+
+        OAuth2UserInfo oAuth2UserInfo = null;
+        if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
+            System.out.println("구글 로그인 요청");
+            oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+        } else if (userRequest.getClientRegistration().getRegistrationId().equals("facebook")) {
+            System.out.println("페이스북 로그인 요청");
+            oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
+        } else {
+            System.out.println("구글과 페이스북만 지원");
+        }
+        String provider = oAuth2UserInfo.getProvider();
+        String providerId = oAuth2UserInfo.getProviderId(); // google 기준으로 적은 것이기 때문에 null 로 나온다. 페이스북은 id 로 온다.
+        String username = provider + "_" + providerId;
+        String email = oAuth2UserInfo.getEmail();
         String role = "ROLE_USER";
 
         User userEntity = userRepository.findByUsername(username);
