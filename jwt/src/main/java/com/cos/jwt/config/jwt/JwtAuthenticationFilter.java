@@ -1,5 +1,7 @@
 package com.cos.jwt.config.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.cos.jwt.config.auth.PrincipalDetails;
 import com.cos.jwt.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Date;
 
 // 스프링 시큐리티에 UsernamePasswordAuthenticationFilter 가 있음
 // /login 요청해서 username, password 를 전송하면 (post)
@@ -26,12 +29,12 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    
+
     // login 요청을 하면 로그인 시도를 위해 실행되는 함수
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         System.out.println("JwtAuthenticationFilter.attemptAuthentication");
-        
+
         // username, password 를 받아서 정상인지 로그인 시도를 해보는 것
         try {
             // 원시적인 방법으로는 아래처럼 할 수도 있긴 하다.
@@ -44,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             ObjectMapper objectMapper = new ObjectMapper(); // json 데이터 파싱 용 클래스
             User user = objectMapper.readValue(request.getInputStream(), User.class);
             System.out.println("user = " + user);
-            
+
             // 이렇게 만든 토큰으로 로그인 시도
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
             // 이 때 PrincipalDetailsService 의 loadUserByUsername() 이 실행
@@ -72,6 +75,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         System.out.println("JwtAuthenticationFilter.successfulAuthentication 실행, 인증 완료라는 뜻");
-        super.successfulAuthentication(request, response, chain, authResult);
+        PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
+
+        // RSA 방식이 아니고 Hash 암호 방식, 이 방식은 서버만 알고 있는 시크릿 키를 가지고 있어야 한다.
+        String jwtToken = JWT.create()
+                .withSubject("cos 토큰") // 토큰 이름
+                .withExpiresAt(new Date(System.currentTimeMillis() + (60000 * 10)))
+                .withClaim("id", principalDetails.getUser().getId())
+                .withClaim("username", principalDetails.getUsername())
+                .sign(Algorithm.HMAC512("cos"));
+
+        response.addHeader("Authorization", "Bearer " + jwtToken);
     }
 }
