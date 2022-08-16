@@ -23,8 +23,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilter(corsFilter) // 이렇게 등록까지 하면 모든 ip 를 다 허용하게 해놨으므로 cross origin 요청이 와도 허용한다.
                 .formLogin().disable() // jwt 서버니까 폼 로그인 X
-                .httpBasic().disable()
-                .httpBasic().disable()
+                .httpBasic().disable() // Authorization 에 ID 랑 PW 를 담아서 요청하는 것(httpBasic)을 disable.
+                                        // 여기서 구현할 것은 Authorization 에 token 을 담는 Bearer 방식
                 .authorizeRequests()
                 // 유저쪽으로는 USER, MANAGER, ADMIN 가능
                 .antMatchers("/api/v1/user/**").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
