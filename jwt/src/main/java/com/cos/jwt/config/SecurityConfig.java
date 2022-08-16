@@ -1,5 +1,6 @@
 package com.cos.jwt.config;
 
+import com.cos.jwt.config.jwt.JwtAuthenticationFilter;
 import com.cos.jwt.filter.MyFilter1;
 import com.cos.jwt.filter.MyFilter3;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable() // jwt 서버니까 폼 로그인 X
                 .httpBasic().disable() // Authorization 에 ID 랑 PW 를 담아서 요청하는 것(httpBasic)을 disable.
                                         // 여기서 구현할 것은 Authorization 에 token 을 담는 Bearer 방식
+                // 로그인을 진행하는 필터이기 때문에 이 필터에는 꼭 AuthenticationManager 를 던져줘야 한다.
+                // WebSecurityConfigurerAdapter 가 들고있기 때문에 그냥 아래처럼 해주기만 하면 된다.
+                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
                 .authorizeRequests()
                 // 유저쪽으로는 USER, MANAGER, ADMIN 가능
                 .antMatchers("/api/v1/user/**").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
