@@ -25,7 +25,7 @@ public class User {
 
     public List<String> getRoleList() {
         if (roles.length() > 0) {
-            return Arrays.asList(roles.split("."));
+            return Arrays.asList(roles.split(","));
         }
         return new ArrayList<>();
     }
